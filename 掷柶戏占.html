@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掷柶戏占 | 随安</title>
+<link rel="icon" href="https://picsum.photos/id/1025/32/32" type="image/png">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+:root {
+  --main-color: #9c6644;
+  --second-color: #c8a878;
+  --bg-main: #f8f5f0;
+  --bg-container: rgba(255, 253, 248, 0.96);
+  --bg-text: #faf7f0;
+  --text-main: #222;
+  --text-gray: #666;
+  --text-tip: #88735d;
+  --border-main: 1px solid var(--main-color);
+  --shadow-main: 0 6px 15px rgba(156,102,68,0.08);
+  --radius-sm: 2px;
+  --radius-base: 4px;
+  --bg-btn: #fff;
+  --bg-btn-hover-text: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --main-color: #b98867;
+    --second-color: #d0b898;
+    --bg-main: #231f1c;
+    --bg-container: rgba(35, 31, 28, 0.96);
+    --bg-text: #3a332b;
+    --text-main: #f0e6d2;
+    --text-gray: #d0c8b8;
+    --text-tip: #9c8264;
+    --border-main: 1px solid var(--main-color);
+    --shadow-main: 0 6px 15px rgba(0,0,0,0.2);
+    --bg-btn: #3a332b;
+    --bg-btn-hover-text: #231f1c;
+  }
+}
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "SimSun", sans-serif;
+  background: var(--bg-main);
+  background-image: url("https://img.ixiaocai.cn/uploads/2024/09/12/66e2279089998.jpg");
+  background-blend-mode: soft-light;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: var(--text-main);
+  padding: 10px;
+  line-height: 1.8;
+  position: relative;
+}
+.anti-theft {
+  position: fixed;
+  bottom: 30px;
+  right: 15px;
+  font-family: "Noto Serif SC", "SimSun", serif;
+  font-size: 14px;
+  color: #806348;
+  letter-spacing: 1px;
+  line-height: 1.8;
+  text-align: right;
+  z-index: 99;
+  background: transparent;
+  opacity: 0.85;
+}
+@media (prefers-color-scheme: dark) {
+  .anti-theft {
+    color: #c8a878;
+    background: rgba(35, 31, 28, 0.9);
+    opacity: 0.85;
+  }
+}
+@media (max-width: 375px) {
+  .anti-theft {
+    font-size: 12px;
+    bottom: 25px;
+    right: 10px;
+    padding: 6px 10px;
+  }
+}
+.anti-theft .name {
+  font-family: "Ma Shan Zheng", "KaiTi", cursive;
+  font-size: 18px;
+  letter-spacing: 2px;
+  display: block;
+}
+@media (max-width: 375px) {
+  .anti-theft .name {
+    font-size: 16px;
+  }
+}
+.container {
+  max-width: 600px;
+  margin: 30px auto;
+  background: var(--bg-container);
+  border: var(--border-main);
+  border-radius: var(--radius-base);
+  padding: 35px 25px 60px;
+  box-shadow: var(--shadow-main);
+}
+@media (max-width: 375px) {
+  .container {
+    padding: 20px 15px 50px;
+    margin: 20px auto;
+  }
+}
+h1 {
+  font-family: "Ma Shan Zheng", "KaiTi", cursive;
+  font-size: 36px;
+  font-weight: normal;
+  text-align: center;
+  margin-bottom: 6px;
+  color: var(--main-color);
+  letter-spacing: 6px;
+  text-shadow: 0 0 1px var(--main-color), 0 0 2px rgba(156,102,68,0.2);
+}
+@media (max-width: 375px) {
+  h1 {
+    font-size: 30px;
+    letter-spacing: 4px;
+  }
+}
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-gray);
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+}
+.menu {
+  margin: 30px 0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-block;
+  padding: 12px 28px;
+  border: var(--border-main);
+  background: var(--bg-btn);
+  color: var(--main-color);
+  cursor: pointer;
+  font-size: 15px;
+  border-radius: var(--radius-sm);
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  transform-origin: center;
+}
+@media (max-width: 375px) {
+  .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+@keyframes btnShake {
+  0% { transform: translateY(-2px) rotate(0deg); }
+  25% { transform: translateY(-2px) rotate(1deg); }
+  50% { transform: translateY(-2px) rotate(0deg); }
+  75% { transform: translateY(-2px) rotate(-1deg); }
+  100% { transform: translateY(-2px) rotate(0deg); }
+}
+.btn:hover {
+  background: var(--main-color);
+  color: var(--bg-btn-hover-text);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(156,102,68,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+@media (prefers-color-scheme: dark) {
+  .btn:hover {
+    box-shadow: 0 2px 8px rgba(185,136,103,0.2), inset 0 1px 0 rgba(0,0,0,0.1);
+  }
+}
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(156,102,68,0.2) !important;
+}
+.small-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+}
+#inputWrap {
+  display: none;
+  max-width: 400px;
+  margin: 0 auto;
+  flex-direction: column;
+  gap: 8px;
+}
+.input-box {
+  width: 100%;
+  padding: 14px 20px;
+  border: var(--border-main);
+  font-size: 18px;
+  text-align: center;
+  outline: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-btn);
+  color: var(--text-main);
+  font-family: "Noto Serif SC", "SimSun", serif;
+}
+.input-count-tip {
+  font-size: 13px;
+  color: var(--main-color);
+  text-align: center;
+  margin-top: 4px;
+}
+.input-box::placeholder {
+  color: #b8a38c;
+  font-style: italic;
+  letter-spacing: 1px;
+}
+.input-box:focus {
+  border-color: var(--main-color);
+  box-shadow: 0 0 0 2px rgba(156,102,68,0.2);
+}
+@media (prefers-color-scheme: dark) {
+  .input-box:focus {
+    box-shadow: 0 0 0 2px rgba(185,136,103,0.2);
+  }
+}
+.input-tip {
+  font-size: 12px;
+  color: var(--text-tip);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.operate-btn {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+#shakeAnimate {
+  display: none;
+  text-align: center;
+  margin: 20px 0;
+  font-family: "Ma Shan Zheng", "KaiTi", cursive;
+  font-size: 24px;
+  color: var(--main-color);
+  letter-spacing: 3px;
+  opacity: 0;
+  animation: shake 0.8s infinite linear, fadeIn 0.3s forwards;
+}
+@media (max-width: 375px) {
+  #shakeAnimate {
+    font-size: 20px;
+  }
+}
+@keyframes shake {
+  0% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+  100% { transform: rotate(-3deg); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.shake-numbers {
+  font-size: 28px;
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-family: "Ma Shan Zheng", "KaiTi", cursive;
+}
+@media (max-width: 375px) {
+  .shake-numbers {
+    font-size: 24px;
+    gap: 15px;
+  }
+}
+.shake-number {
+  animation: jump 0.5s infinite alternate;
+}
+.shake-number:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.shake-number:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes jump {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+.result {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #f0e6d2;
+  display: none;
+  animation: fadeIn 0.5s ease-in-out;
+  transition: all 0.3s ease;
+}
+@media (prefers-color-scheme: dark) {
+  .result {
+    border-top-color: #4a4138;
+  }
+}
+.result:hover {
+  box-shadow: 0 0 12px rgba(156,102,68,0.1);
+}
+@media (prefers-color-scheme: dark) {
+  .result:hover {
+    box-shadow: 0 0 12px rgba(185,136,103,0.1);
+  }
+}
+.result-title {
+  font-family: "Ma Shan Zheng", "KaiTi", cursive;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--main-color);
+  letter-spacing: 4px;
+  text-shadow: 0 0 1px var(--main-color);
+}
+@media (max-width: 375px) {
+  .result-title {
+    font-size: 22px;
+  }
+}
+.section {
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+.label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+  color: var(--main-color);
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+.text {
+  white-space: pre-wrap;
+  font-size: 15px;
+  color: #333;
+  line-height: 1.9;
+  background: var(--bg-text);
+  padding: 18px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid;
+  border-image: linear-gradient(to bottom, var(--main-color), var(--second-color)) 1 100%;
+  font-family: "Noto Serif SC", "SimSun", serif;
+  cursor: copy;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+@media (prefers-color-scheme: dark) {
+  .text {
+    color: #e0d8c8;
+  }
+}
+@media (max-width: 375px) {
+  .text {
+    padding: 14px;
+  }
+}
+.text:hover {
+  background: #f5f0e6;
+}
+@media (prefers-color-scheme: dark) {
+  .text:hover {
+    background: #413830;
+  }
+}
+.desc {
+  font-size: 13px;
+  text-align: center;
+  margin-top: 30px;
+  color: var(--text-gray);
+  line-height: 1.6;
+  padding: 0 10px;
+}
+.copy-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  font-family: "Noto Serif SC", "SimSun", serif;
+  padding: 12px 24px;
+  border-radius: var(--radius-base);
+  font-size: 16px;
+  letter-spacing: 2px;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.copy-toast.show {
+  opacity: 1;
+}
+.loading-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-main);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+}
+.loading-text {
+  font-family: "Ma Shan Zheng", "KaiTi", cursive;
+  font-size: 28px;
+  color: var(--main-color);
+  letter-spacing: 4px;
+  animation: fadeIn 1s infinite alternate;
+}
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .menu, .operate-btn, .shake-numbers, .loading-mask {
+    display: -ms-flexbox;
+    -ms-flex-pack: center;
+    -ms-flex-align: center;
+  }
+  .input-box {
+    -ms-flex: 1;
+  }
+}
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500&display=swap');
+</style>
+</head>
+<body>
+<div class="loading-mask" id="loadingMask">
+  <div class="loading-text">心念问题 静心起卦</div>
+</div>
+<div class="anti-theft">
+  <span class="name">随安</span>
+  微信号：yu2102897706<br>
+  公众号：易梅安
+</div>
+<div class="copy-toast" id="copyToast">卦辞已誊抄完毕～</div>
+<div class="container">
+  <h1>掷柶戏占</h1>
+  <div class="subtitle">寂然不动 · 感而遂通</div>
+  <div class="menu">
+    <button class="btn" id="randomBtn">随机起卦</button>
+    <button class="btn" id="manualBtn">手动摇数</button>
+  </div>
+  <div id="shakeAnimate">
+    摇卦中...
+    <div class="shake-numbers">
+      <span class="shake-number" id="num1">一</span>
+      <span class="shake-number" id="num2">二</span>
+      <span class="shake-number" id="num3">三</span>
+    </div>
+  </div>
+  <div id="inputWrap" style="display: none;">
+    <input type="number" class="input-box" id="numInput" placeholder="「请摇三位卦数 1-4」" maxlength="3">
+    <div class="input-tip">仅支持1-4三位数字，如123</div>
+    <div class="input-count-tip" id="inputCountTip">还需3位数字</div>
+    <div class="operate-btn">
+      <button class="btn" id="searchBtn">开始占卦</button>
+      <button class="btn small-btn" id="resetBtn">重置清空</button>
+    </div>
+  </div>
+  <div class="result" id="result">
+    <div class="result-title" id="guaTitle"></div>
+    <div class="section">
+      <span class="label">卦象解读：</span>
+      <div class="text" id="cnText"></div>
+    </div>
+  </div>
+  <div class="desc">心中专注所想之事，摇数起卦方得灵验</div>
+</div>
+<script>
+if (!Array.prototype.forEach) {
+  Array.prototype.forEach = function(callback) {
+    for (var i = 0; i < this.length; i++) {
+      callback(this[i], i, this);
+    }
+  };
+}
+if (!String.prototype.includes) {
+  String.prototype.includes = function(search) {
+    return this.indexOf(search) !== -1;
+  };
+}
+const GUA = {
+  "111": ["鼠得穀","老鼠进入粮仓之象，春夏平顺，秋冬大吉。"],
+  "112": ["鱼失水","鱼儿失去水之象，今年将会处境艰难。"],
+  "113": ["夜得烛","暗夜中得到烛火之象，将会心想事成。"],
+  "114": ["木逢春","树木遇到了春天之象，春夏大通，秋冬平顺。"],
+  "121": ["玉无瑕","璞玉没有瑕疵，乃是怀胎之象。"],
+  "122": ["罪成功","罪人立下了功劳，乃是获得横财之象。"],
+  "123": ["蝶赴火","蝴蝶进入火中之象，需小心身体疾病。"],
+  "124": ["松带雨","青松得到了降雨，叶片青翠欲滴。"],
+  "131": ["鹤失巢","仙鹤失去了巢穴，乃是搬家移居之象。"],
+  "132": ["饥得食","饥饿之人得到了食物之象，乃是怀胎之象。"],
+  "133": ["龟入筐","乌龟进入了笼筐之象，易产生罪责。"],
+  "134": ["龙入海","巨龙进入大海之象，能享有荣华。"],
+  "141": ["树无根","树木没有根基之象，今年将会贫寒困顿。"],
+  "142": ["寒得衣","寒冷时得到了衣服，乃是生子之象。"],
+  "143": ["死还生","死者复生，将会遇到令人畅快的好事。"],
+  "144": ["贫得宝","贫穷时得到宝物之象，将会变得富贵。"],
+  "211": ["日入云","太阳进入了云层之象，乃是会遇到郁闷不顺之事。"],
+  "212": ["霖见晖","连绵阴雨中得到了阳光之象，将会享有荣华。"],
+  "213": ["弓得矢","持弓之人得到了箭矢之象，将生男婴。"],
+  "214": ["鸟无翼","鸟儿没有翅膀之象，身数不吉利。"],
+  "221": ["马驮重","马背上载满了重担之象，辛劳虽多却无功劳回报。"],
+  "222": ["鹤上天","仙鹤飞升到天空之象，将遇贵人并心想事成。"],
+  "223": ["鹰得食","雄鹰得到了食物之象，身数大通且享有荣华。"],
+  "224": ["车无毂","车轮没有轮毂之象，切勿与人进行大项目交易。"],
+  "231": ["儿得乳","幼儿得到了乳汁之象，衣食将会非常丰足。"],
+  "232": ["病得药","病人得到了药物之象，将会心想事成。"],
+  "233": ["风起浪","大风掀起波浪之象，将会遇到意外的风波。"],
+  "234": ["弓无箭","弓箭没有箭矢之象，百事皆不吉利。"],
+  "241": ["虎入山","猛虎进入深山之象，虽威风但恐受人排挤，切莫过于得意。"],
+  "242": ["鼠入水","老鼠落入水中之象，今年运势不吉利。"],
+  "243": ["盲开眼","盲人睁开了眼睛之象，将会遇到欣喜之事。"],
+  "244": ["海得船","在大海中得到船只之象，今年有能得横财的运势。"],
+  "311": ["君得臣","君王得到了贤臣之象，万事太平顺遂。"],
+  "312": ["热得扇","盛暑中得到了扇子之象，春夏大吉，秋冬平顺。"],
+  "313": ["鹰无爪","雄鹰没有利爪之象，每事皆不成。"],
+  "314": ["珠投江","明珠投入江水之象，需小心飞来横祸。"],
+  "321": ["龙得角","巨龙长出双角之象，乃是大富大贵之运。"],
+  "322": ["鸟脱网","鸟儿脱离了罗网之象，乃是躲避灾厄之运。"],
+  "323": ["旱得霖","久旱逢甘霖之象，乃是大富大贵、生子添丁之运。"],
+  "324": ["猫窥鼠","猫儿窥视老鼠之象，若犯罪则难以逃脱。"],
+  "331": ["牛斗虎","牛与猛虎争斗之象，需小心意外的风波。"],
+  "332": ["花结实","花朵结出果实之象，将会生子（或有收获）。"],
+  "333": ["鸟得翼","鸟儿得到了翅膀之象，万事如意。"],
+  "334": ["僧退俗","僧侣还俗之象，今年若是搬迁则大吉大利。"],
+  "341": ["屋无盖","房屋没有屋瓦之象，需小心官司与口舌是非。"],
+  "342": ["马脱勒","马儿脱掉笼头之象，不知道该去往何处。"],
+  "343": ["行得路","行人找到了道路之象，所经营的事业将顺心如意。"],
+  "344": ["花逢春","花儿遇到了春天之象，官位将会步步高升。"],
+  "411": ["父得子","父亲得到了儿子之象，乃是享有荣华之运。"],
+  "412": ["事无功","辛劳做事却无功劳之象，切勿去探视他人的病人。"],
+  "413": ["龙得雨","龙得到了降雨之象，万事皆大吉大利。"],
+  "414": ["盲得眼","盲人获得了眼睛之象，将获得财物并见到荣华。"],
+  "421": ["友为仕","亲近之人变得尊贵之象，将因他人助力而成事。"],
+  "422": ["农无牛","农家没有耕牛之象，徒费力气而无所得。"],
+  "423": ["愚得智","平庸之人获得了智慧之象，有入仕做官的运势。"],
+  "424": ["人无屋","人没有房屋之象，衣食无着，四处漂泊。"],
+  "431": ["聋得聪","失聪之人恢复听觉之象，贫穷的人将会变成富人。"],
+  "432": ["愁得喜","忧愁中遇到了喜事之象，前程将会顺心如意。"],
+  "433": ["失更得","找回迷失的道路，将会有与以往不同的崭新局面。"],
+  "434": ["行得马","行人得到了骏马之象，乃是获得财物之运。"],
+  "441": ["履薄冰","踩在薄冰之上之象，春夏不吉，秋冬大吉。"],
+  "442": ["鱼吞钩","鱼儿上钩被钓之象，事事均不顺利。"],
+  "443": ["鳏得寡","鳏夫娶了寡妇之象，乃是享有荣华之运。"],
+  "444": ["将胜战","将军打胜仗，名声将会传遍四方。"]
+};
+const numMap = {1:"一",2:"二",3:"三",4:"四"};
+const numToChinese = {1:"一",2:"二",3:"三",4:"四"};
+const numInput = document.getElementById("numInput");
+const inputWrap = document.getElementById("inputWrap");
+const result = document.getElementById("result");
+const shakeAnimate = document.getElementById("shakeAnimate");
+const guaTitle = document.getElementById("guaTitle");
+const cnText = document.getElementById("cnText");
+const inputCountTip = document.getElementById("inputCountTip");
+const copyToast = document.getElementById("copyToast");
+const loadingMask = document.getElementById("loadingMask");
+const num1 = document.getElementById("num1");
+const num2 = document.getElementById("num2");
+const num3 = document.getElementById("num3");
+const SHAKE_DELAY = 900;
+let jumpInterval = null;
+
+window.onload = function() {
+  setTimeout(() => {
+    loadingMask.style.opacity = 0;
+    setTimeout(() => {
+      loadingMask.style.display = "none";
+    }, 500);
+  }, 800);
+  updateInputCountTip();
+};
+function copyTextToClipboard(text) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast();
+    }).catch(err => {
+      alert("卦辞誊抄失败，请手动誊抄～");
+    });
+  } else {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast();
+  }
+}
+function showToast() {
+  copyToast.classList.add("show");
+  setTimeout(() => {
+    copyToast.classList.remove("show");
+  }, 3000);
+}
+function updateInputCountTip() {
+  const len = numInput.value.length;
+  const remain = 3 - len;
+  if (remain === 3) {
+    inputCountTip.innerText = "还需3位数字";
+  } else if (remain > 0) {
+    inputCountTip.innerText = `还需${remain}位数字`;
+  } else {
+    inputCountTip.innerText = "位数已够，可开始占卦";
+  }
+}
+function btnShakeEffect(btn) {
+  btn.style.animation = "btnShake 0.5s ease";
+  setTimeout(() => {
+    btn.style.animation = "";
+  }, 500);
+}
+function throwOnce() {
+  while (true) {
+    let cnt = 0;
+    for (let i=0; i<4; i++) if (Math.random() > 0.5) cnt++;
+    if (cnt >=1 && cnt <=4) return cnt;
+  }
+}
+function randomGua() {
+  let a = throwOnce();
+  let b = throwOnce();
+  let c = throwOnce();
+  return ""+a+b+c;
+}
+function showResult(key) {
+  if (!GUA[key]) {
+    alert("请输入1-4组成的三位卦数，如324");
+    stopJumpNumbers();
+    shakeAnimate.style.display = "none";
+    return;
+  }
+  let [name, cn] = GUA[key];
+  let cnNum = numMap[key[0]] + numMap[key[1]] + numMap[key[2]];
+  guaTitle.innerText = `【${cnNum}】${name}`;
+  cnText.innerText = cn;
+  stopJumpNumbers();
+  shakeAnimate.style.display = "none";
+  result.style.display = "block";
+}
+function resetAll() {
+  numInput.value = "";
+  result.style.display = "none";
+  stopJumpNumbers();
+  shakeAnimate.style.display = "none";
+  updateInputCountTip();
+  numInput.focus();
+}
+function startJumpNumbers() {
+  stopJumpNumbers();
+  jumpInterval = setInterval(() => {
+    const n1 = Math.floor(Math.random()*4)+1;
+    const n2 = Math.floor(Math.random()*4)+1;
+    const n3 = Math.floor(Math.random()*4)+1;
+    num1.innerText = numToChinese[n1];
+    num2.innerText = numToChinese[n2];
+    num3.innerText = numToChinese[n3];
+  }, 300);
+}
+function stopJumpNumbers() {
+  if (jumpInterval) {
+    clearInterval(jumpInterval);
+    jumpInterval = null;
+  }
+}
+function startShake(cb) {
+  shakeAnimate.style.display = "block";
+  startJumpNumbers();
+  result.style.display = "none";
+  setTimeout(() => {
+    cb();
+  }, SHAKE_DELAY);
+}
+document.getElementById("randomBtn").onclick = function() {
+  btnShakeEffect(this);
+  inputWrap.style.display = "none";
+  startShake(() => showResult(randomGua()));
+};
+document.getElementById("manualBtn").onclick = function() {
+  btnShakeEffect(this);
+  inputWrap.style.display = "flex";
+  resetAll();
+  numInput.select();
+};
+document.getElementById("searchBtn").onclick = function() {
+  btnShakeEffect(this);
+  let val = numInput.value.trim().replace(/\s/g, "");
+  if(val.length!==3) return alert("请输入3位1-4的数字");
+  startShake(() => showResult(val));
+};
+document.getElementById("resetBtn").onclick = function() {
+  btnShakeEffect(this);
+  resetAll();
+};
+numInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("searchBtn").click();
+});
+numInput.addEventListener("input", () => {
+  numInput.value = numInput.value.replace(/[^1-4]/g, "").slice(0, 3);
+  updateInputCountTip();
+});
+cnText.addEventListener("click", () => {
+  copyTextToClipboard(cnText.innerText);
+});
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  alert("心诚则灵，请勿搬运代码～");
+});
+document.body.style.backgroundImage = "url('https://img.ixiaocai.cn/uploads/2024/09/12/66e2279089998.jpg')";
+document.body.addEventListener('error', function(e) {
+  if (e.target.tagName === 'IMG' || e.target.style.backgroundImage) {
+    document.body.style.backgroundImage = "none";
+  }
+}, true);
+</script>
+</body>
+</html>

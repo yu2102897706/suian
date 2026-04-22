@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>饮食数</title>
+  <style>
+    :root{
+      --bg:#ffffff; --fg:#111; --muted:#666; --line:#ddd; --card:#fff;
+      --btn:#111; --btnfg:#fff; --btn2:#666; --btn2fg:#fff;
+      --pill:#f3f3f3; --pillfg:#111;
+      --active:#2563eb; --activefg:#fff;
+      --danger:#b91c1c; --dangerfg:#fff;
+      --primary1:#2563eb; --primary2:#7c3aed; --primaryfg:#fff;
+    }
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;max-width:1100px;margin:24px auto;padding:0 16px;color:var(--fg);background:var(--bg);}
+    h1{font-size:20px;margin:0 0 14px;}
+    .grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:12px;align-items:start;}
+    @media (max-width:980px){.grid{grid-template-columns:1fr;}}
+    .card{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card);box-shadow:0 1px 0 rgba(0,0,0,.02);}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .row.space{justify-content:space-between;}
+    .sectionTitle{font-weight:700;margin:6px 0 6px;font-size:14px;}
+    .sub{font-size:12px;color:var(--muted);line-height:1.45;}
+    .hr{height:1px;background:var(--line);margin:10px 0;}
+    button{border:0;border-radius:10px;padding:10px 14px;background:var(--btn);color:var(--btnfg);cursor:pointer;}
+    button.secondary{background:var(--btn2);color:var(--btn2fg);}
+    button.danger{background:var(--danger);color:var(--dangerfg);}
+    button.ghost{background:transparent;border:1px solid var(--line);color:var(--fg);}
+    button.small{padding:7px 10px;border-radius:9px;font-size:12px;}
+    button.pill{background:var(--pill);color:var(--pillfg);border:1px solid #e8e8e8;}
+    button.pill.active{background:var(--active);color:var(--activefg);border-color:transparent;}
+    button.pill:disabled{opacity:.35;cursor:not-allowed;}
+    button.primaryBig{
+      font-size:15px;
+      padding:12px 16px;
+      border-radius:14px;
+      color:var(--primaryfg);
+      background:linear-gradient(135deg,var(--primary1),var(--primary2));
+      box-shadow:0 10px 24px rgba(37,99,235,.22);
+      font-weight:800;
+      letter-spacing:.5px;
+    }
+    button.primaryBig:active{transform:translateY(1px);}
+    .picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    @media (max-width:680px){.picker{grid-template-columns:1fr;}}
+    .slot{border:1px dashed #e2e2e2;border-radius:12px;padding:10px;}
+    .slotHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .slotName{font-weight:700;}
+    .btnGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:10px;}
+    @media (max-width:520px){.btnGrid{grid-template-columns:repeat(4,minmax(0,1fr));}}
+    .btnGrid.zhi{grid-template-columns:repeat(6,minmax(0,1fr));}
+    @media (max-width:520px){.btnGrid.zhi{grid-template-columns:repeat(4,minmax(0,1fr));}}
+    pre{white-space:pre-wrap;word-break:break-word;background:#0b0b0b;color:#f2f2f2;border-radius:12px;padding:12px;min-height:180px;margin:0;}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;}
+    .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+    .badge b{color:var(--fg);}
+    .historyList{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+    .histItem{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fafafa;}
+    .histTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;}
+    .histMeta{font-size:12px;color:var(--muted);line-height:1.4;}
+    .histBtns{display:flex;gap:8px;flex-wrap:wrap;}
+    .histOut{margin-top:8px;background:#0b0b0b;color:#f2f2f2;border-radius:12px;padding:10px;font-size:12px;max-height:160px;overflow:auto;white-space:pre-wrap;}
+    .toggle{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .toggle input{transform:scale(1.1);}
+  </style>
+</head>
+<body>
+  <h1>饮食数</h1>
+
+  <div class="grid">
+    <div class="card">
+      <div class="row space">
+        <div>
+          <div class="sectionTitle">输入选择</div>
+          <div class="sub">
+            规则：① 四柱为空→必须三传齐→只算【饮食策数】；② 四柱不空且初传空→只算【干支作卦】；③ 四柱不空且三传齐→三段都输出。
+            <br/>联动：每一柱/每一传的“天干+地支”只能组成<strong>六十甲子</strong>（三传天干允许“〇”不限制地支）。
+          </div>
+        </div>
+        <div class="toggle">
+          <label class="badge"><input id="useSizhu" type="checkbox" checked> <b>启用四柱</b></label>
+          <label class="badge"><input id="useChuan" type="checkbox" checked> <b>启用三传</b></label>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="picker">
+        <!-- 四柱 -->
+        <div class="slot" id="sizhuSlot">
+          <div class="slotHeader">
+            <div class="slotName">四柱干支（六十甲子）</div>
+            <div class="row">
+              <button class="small ghost" id="clearSizhuBtn">清空四柱</button>
+              <span class="badge">当前：<b id="sizhuValue" class="mono">（空）</b></span>
+            </div>
+          </div>
+          <div class="sub" style="margin-top:6px;">依次选：年、月、日、时（每柱=天干+地支，受六十甲子约束）。</div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <span class="badge">正在编辑：</span>
+            <button class="small pill active" data-sizhu-idx="0">年</button>
+            <button class="small pill" data-sizhu-idx="1">月</button>
+            <button class="small pill" data-sizhu-idx="2">日</button>
+            <button class="small pill" data-sizhu-idx="3">时</button>
+          </div>
+
+          <div class="sectionTitle" style="margin-top:10px;">天干</div>
+          <div class="btnGrid" id="ganBtnsSizhu"></div>
+
+          <div class="sectionTitle" style="margin-top:10px;">地支</div>
+          <div class="btnGrid zhi" id="zhiBtnsSizhu"></div>
+
+          <div class="hr"></div>
+          <div class="row">
+            <button class="small ghost" id="unsetSizhuGanBtn">当前柱：清空天干</button>
+            <button class="small ghost" id="unsetSizhuZhiBtn">当前柱：清空地支</button>
+          </div>
+        </div>
+
+        <!-- 三传 -->
+        <div class="slot" id="chuanSlot">
+          <div class="slotHeader">
+            <div class="slotName">三传（六十甲子 / 天干可“〇”）</div>
+            <div class="row">
+              <button class="small ghost" id="clearChuanBtn">清空三传</button>
+              <span class="badge">当前：<b id="chuanValue" class="mono">（空）</b></span>
+            </div>
+          </div>
+          <div class="sub" style="margin-top:6px;">
+            初传可选“〇（无天干）”。若启用四柱且初传留空（天干地支都未选）→ 只输出干支作卦。
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <span class="badge">正在编辑：</span>
+            <button class="small pill active" data-chuan-idx="0">初</button>
+            <button class="small pill" data-chuan-idx="1">中</button>
+            <button class="small pill" data-chuan-idx="2">末</button>
+          </div>
+
+          <div class="sectionTitle" style="margin-top:10px;">天干（含〇）</div>
+          <div class="btnGrid" id="ganBtnsChuan"></div>
+
+          <div class="sectionTitle" style="margin-top:10px;">地支</div>
+          <div class="btnGrid zhi" id="zhiBtnsChuan"></div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <button class="small ghost" id="unsetChuanGanBtn">当前传：清空天干</button>
+            <button class="small ghost" id="unsetChuanZhiBtn">当前传：清空地支</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row" style="align-items:stretch;">
+        <button id="runBtn" class="primaryBig" style="flex:1;min-width:220px;">✨ 计算并保存到历史</button>
+        <button class="secondary" id="copyBtn">复制输出</button>
+        <button class="secondary" id="fillDemoBtn">填充示例</button>
+        <button class="danger" id="resetAllBtn">全部清空</button>
+      </div>
+      <div class="sub" style="margin-top:8px;">提示：历史保存在本机浏览器 localStorage。</div>
+    </div>
+
+    <div class="card">
+      <div class="row space">
+        <div class="sectionTitle">输出</div>
+        <div class="row">
+          <button class="small ghost" id="clearOutBtn">清空输出</button>
+        </div>
+      </div>
+      <pre id="out" class="mono"></pre>
+
+      <div class="hr"></div>
+
+      <div class="row space">
+        <div class="sectionTitle">历史记录</div>
+        <div class="row">
+          <button class="small ghost" id="exportHistoryBtn">导出JSON</button>
+          <button class="small danger" id="clearHistoryBtn">清空历史</button>
+        </div>
+      </div>
+      <div class="sub">点击“回填”可把历史条目重新载入。</div>
+      <div id="history" class="historyList"></div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------------- 常量（同步新脚本） ----------------
+  const TIANGAN_SHU = {'甲':4,'乙':4,'丙':3,'丁':3,'戊':8,'己':8,'庚':1,'辛':1,'壬':6,'癸':6};
+  const DIZHI_SHU = {'子':6,'丑':8,'寅':4,'卯':4,'辰':8,'巳':3,'午':3,'未':8,'申':2,'酉':2,'戌':8,'亥':6};
+
+  const TIANGAN_VALUES = {'甲':108,'乙':128,'丙':9,'丁':34,'戊':21,'己':24,'庚':25,'辛':48,'壬':108,'癸':128};
+  const DIZHI_VALUES = {'子':21,'丑':9,'寅':9,'卯':25,'辰':48,'巳':48,'午':24,'未':128,'申':128,'酉':34,'戌':108,'亥':108};
+
+  const YANG_ZHI = new Set(['子','寅','辰','午','申','戌']);
+  const YIN_ZHI  = new Set(['丑','卯','巳','未','酉','亥']);
+
+  const NUM_TO_CHINESE = {0:'〇',1:'一',2:'二',3:'三',4:'四',5:'五',6:'六',7:'七',8:'八',9:'九'};
+  const NUM_TO_GUA = {0:'空',1:'艮',2:'兑',3:'坎',4:'离',5:'震',6:'巽',7:'艮',8:'坤',9:'乾'};
+  const GUA_TO_WUXING = {'艮':'土','兑':'金','坎':'水','离':'火','震':'木','巽':'木','乾':'金','坤':'土','空':'无'};
+
+  const GUA_BIN = {
+    '乾':[1,1,1],
+    '兑':[1,1,0],
+    '离':[1,0,1],
+    '震':[1,0,0],
+    '巽':[0,1,1],
+    '坎':[0,1,0],
+    '艮':[0,0,1],
+    '坤':[0,0,0],
+  };
+  const BIN_TO_INDEX = new Map([
+    [[1,1,1].toString(),0],
+    [[1,1,0].toString(),1],
+    [[1,0,1].toString(),2],
+    [[1,0,0].toString(),3],
+    [[0,1,1].toString(),4],
+    [[0,1,0].toString(),5],
+    [[0,0,1].toString(),6],
+    [[0,0,0].toString(),7],
+  ]);
+  const GUA_KEYS = Object.keys(GUA_BIN);
+  const GUA_NAMES = [
+    ["乾为天","天泽履","天火同人","天雷无妄","天风姤","天水讼","天山遁","天地否"],
+    ["泽天夬","兑为泽","泽火革","泽雷随","泽风大过","泽水困","泽山咸","泽地萃"],
+    ["火天大有","火泽睽","离为火","火雷噬嗑","火风鼎","火水未济","火山旅","火地晋"],
+    ["雷天大壮","雷泽归妹","雷火丰","震为雷","雷风恒","雷水解","雷山小过","雷地豫"],
+    ["风天小畜","风泽中孚","风火家人","风雷益","巽为风","风水涣","风山渐","风地观"],
+    ["水天需","水泽节","水火既济","水雷屯","水风井","坎为水","水山蹇","水地比"],
+    ["山天大畜","山泽损","山火贲","山雷颐","山风蛊","山水蒙","艮为山","山地剥"],
+    ["地天泰","地泽临","地火明夷","地雷复","地风升","地水师","地山谦","坤为地"],
+  ];
+
+  const YANG = "▄▄▄";
+  const YIN  = "▄　▄";
+
+  const REF_GUA_MAP = new Map([
+    [[true,true,true].toString(),'坤'],
+    [[true,true,false].toString(),'震'],
+    [[true,false,true].toString(),'坎'],
+    [[true,false,false].toString(),'兑'],
+    [[false,true,true].toString(),'艮'],
+    [[false,true,false].toString(),'离'],
+    [[false,false,true].toString(),'巽'],
+    [[false,false,false].toString(),null],
+  ]);
+
+  const GAN_LIST = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const ZHI_LIST = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+  // ---------------- 六十甲子联动（同之前） ----------------
+  const allowedZhiByGan = new Map();
+  const allowedGanByZhi = new Map();
+  for (const g of GAN_LIST) allowedZhiByGan.set(g, new Set());
+  for (const z of ZHI_LIST) allowedGanByZhi.set(z, new Set());
+  for (let k=0;k<60;k++){
+    const gan = GAN_LIST[k % 10];
+    const zhi = ZHI_LIST[k % 12];
+    allowedZhiByGan.get(gan).add(zhi);
+    allowedGanByZhi.get(zhi).add(gan);
+  }
+
+  // ---------------- 工具 ----------------
+  const $ = (id) => document.getElementById(id);
+  const outEl = $("out");
+
+  function nowISO(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+  function copyText(text){
+    return navigator.clipboard?.writeText(text).catch(() => {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    });
+  }
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+  function buildButtons(container, values, onClick){
+    container.innerHTML = "";
+    for (const v of values){
+      const b = document.createElement("button");
+      b.className = "small pill";
+      b.textContent = v;
+      b.addEventListener("click", () => onClick(v, b));
+      container.appendChild(b);
+    }
+  }
+  function setActive(btns, predicate){
+    btns.forEach(b => b.classList.toggle("active", predicate(b)));
+  }
+
+  function applyJiaziConstraint(ganButtons, zhiButtons, selectedGan, selectedZhi, opts){
+    const allowGanNullAnyZhi = !!opts?.allowGanNullAnyZhi;
+
+    ganButtons.forEach(b => b.disabled = false);
+    zhiButtons.forEach(b => b.disabled = false);
+
+    if (allowGanNullAnyZhi && selectedGan === null){
+      return;
+    }
+    if (typeof selectedGan === "string"){
+      const allowedZhi = allowedZhiByGan.get(selectedGan) ?? new Set();
+      zhiButtons.forEach(b => b.disabled = !allowedZhi.has(b.textContent));
+    }
+    if (typeof selectedZhi === "string"){
+      const allowedGan = allowedGanByZhi.get(selectedZhi) ?? new Set();
+      ganButtons.forEach(b => {
+        const g = b.textContent;
+        if (g === "〇") b.disabled = !allowGanNullAnyZhi;
+        else b.disabled = !allowedGan.has(g);
+      });
+    }
+  }
+
+  // ---------------- 核心算法（同步新脚本） ----------------
+  function bin_to_gua_index(binTriple){
+    const idx = BIN_TO_INDEX.get(binTriple.toString());
+    if (idx == null) throw new Error("非法卦爻");
+    return idx;
+  }
+  function get_gua_index_from_liuyao(liuyao){
+    const xia = liuyao.slice(0,3);
+    const shang = liuyao.slice(3,6);
+    return [bin_to_gua_index(shang), bin_to_gua_index(xia)];
+  }
+
+  function get_liuqin(ref_wuxing, target_wuxing){
+    if (target_wuxing === '无') return '〇〇';
+    if (ref_wuxing === target_wuxing) return '兄弟';
+    const sheng = {'金':'水','水':'木','木':'火','火':'土','土':'金'};
+    const ke    = {'金':'木','木':'土','土':'水','水':'火','火':'金'};
+    if (sheng[ref_wuxing] === target_wuxing) return '子孙';
+    if (sheng[target_wuxing] === ref_wuxing) return '父母';
+    if (ke[ref_wuxing] === target_wuxing) return '妻财';
+    if (ke[target_wuxing] === ref_wuxing) return '官鬼';
+    return '未知';
+  }
+
+  function get_jiuxing(ref_bin, target_bin){
+    if (target_bin == null) return '〇〇';
+    const [xia,zhong,shang] = ref_bin;
+    const [t_xia,t_zhong,t_shang] = target_bin;
+    const diff = [shang !== t_shang, zhong !== t_zhong, xia !== t_xia]; // (上,中,下)
+    const map = new Map([
+      [[false,false,false].toString(),'归魂'],
+      [[true,false,false].toString(),'生气'],
+      [[false,true,false].toString(),'绝命'],
+      [[false,false,true].toString(),'祸害'],
+      [[true,true,false].toString(),'天医'],
+      [[false,true,true].toString(),'福德'],
+      [[true,false,true].toString(),'游魂'],
+      [[true,true,true].toString(),'绝体'],
+    ]);
+    return map.get(diff.toString()) ?? '未知';
+  }
+
+  function get_cankao_gua(hui, yun, shi){
+    const nums = [hui, yun, shi];
+
+    const zero_positions = nums.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
+    if (zero_positions.length){
+      const is_empty = [false,false,false];
+      for (const i of zero_positions) is_empty[i] = true;
+      const gua = REF_GUA_MAP.get(is_empty.toString());
+      return [gua, GUA_BIN[gua]];
+    }
+
+    if (nums[0]+nums[1]+nums[2] === 10){
+      return ['坤', GUA_BIN['坤']];
+    }
+
+    const pairs = [[0,1],[0,2],[1,2]];
+    const valid = [];
+    for (const [i,j] of pairs){
+      if (nums[i] + nums[j] === 10) valid.push([i,j]);
+    }
+    if (valid.length === 1){
+      const [i,j] = valid[0];
+      const is_empty = [false,false,false];
+      is_empty[i] = true; is_empty[j] = true;
+      const gua = REF_GUA_MAP.get(is_empty.toString());
+      return [gua, GUA_BIN[gua]];
+    }
+
+    const xia = (shi % 2 === 1) ? 1 : 0;
+    const zhong = (yun % 2 === 1) ? 1 : 0;
+    const shang = (hui % 2 === 1) ? 1 : 0;
+    const bin = [xia, zhong, shang];
+    const idx = bin_to_gua_index(bin);
+    const guaName = GUA_KEYS[idx];
+    return [guaName, GUA_BIN[guaName]];
+  }
+
+  function calc_sizhu_gua(sizhu){
+    // 与新脚本一致：标题不包含变卦/互卦名称，但仍输出三列爻
+    let tian_sum = 0, di_sum = 0;
+    for (const [gan,zhi] of sizhu){
+      tian_sum += TIANGAN_SHU[gan];
+      di_sum += DIZHI_SHU[zhi];
+    }
+
+    let shang_gua_idx = tian_sum % 8;
+    shang_gua_idx = (shang_gua_idx === 0) ? 7 : (shang_gua_idx - 1);
+
+    let xia_gua_idx = di_sum % 8;
+    xia_gua_idx = (xia_gua_idx === 0) ? 7 : (xia_gua_idx - 1);
+
+    const total_sum = tian_sum + di_sum;
+    let dongyao = total_sum % 6;
+    if (dongyao === 0) dongyao = 6;
+
+    const xia_bin = [...GUA_BIN[GUA_KEYS[xia_gua_idx]]];
+    const shang_bin = [...GUA_BIN[GUA_KEYS[shang_gua_idx]]];
+    const zhu_liuyao = xia_bin.concat(shang_bin);
+
+    const bian = [...zhu_liuyao];
+    const pos = dongyao - 1;
+    bian[pos] = 1 - bian[pos];
+    const hu = [
+      zhu_liuyao[1], zhu_liuyao[2], zhu_liuyao[3],
+      zhu_liuyao[2], zhu_liuyao[3], zhu_liuyao[4],
+    ];
+
+    const dong_map = {1:"初爻动",2:"二爻动",3:"三爻动",4:"四爻动",5:"五爻动",6:"上爻动"};
+
+    const zhu_name = GUA_NAMES[shang_gua_idx][xia_gua_idx];
+
+    const zhu_lines = [...zhu_liuyao].reverse().map(bit=>bit?YANG:YIN);
+    const bian_lines = [...bian].reverse().map(bit=>bit?YANG:YIN);
+    const hu_lines = [...hu].reverse().map(bit=>bit?YANG:YIN);
+
+    const out = [];
+    out.push(`【干支作卦】${zhu_name} ${dong_map[dongyao]}`);
+    for (let i=0;i<6;i++){
+      out.push(`${zhu_lines[i]} ${bian_lines[i]} ${hu_lines[i]}`);
+    }
+    return out.join("\n");
+  }
+
+  function format_yinshi_horizontal(yuan, hui, yun, shi,
+    hui_gua, hui_wuxing, hui_liuqin, hui_jiuxing,
+    yun_gua, yun_wuxing, yun_liuqin, yun_jiuxing,
+    shi_gua, shi_wuxing, shi_liuqin, shi_jiuxing
+  ){
+    // 同新脚本 format_yinshi：横向表格
+    const lines = [];
+    lines.push("元  会  运  世");
+    lines.push(`${NUM_TO_CHINESE[yuan]}  ${NUM_TO_CHINESE[hui]}  ${NUM_TO_CHINESE[yun]}  ${NUM_TO_CHINESE[shi]}`);
+    lines.push(`〇  ${hui_gua}  ${yun_gua}  ${shi_gua}`);
+    lines.push(`〇  ${hui_wuxing}  ${yun_wuxing}  ${shi_wuxing}`);
+    lines.push(`〇  ${hui_liuqin[0]}  ${yun_liuqin[0]}  ${shi_liuqin[0]}`);
+    const hui_l2 = (hui_liuqin.length > 1) ? hui_liuqin[1] : '〇';
+    const yun_l2 = (yun_liuqin.length > 1) ? yun_liuqin[1] : '〇';
+    const shi_l2 = (shi_liuqin.length > 1) ? shi_liuqin[1] : '〇';
+    lines.push(`〇  ${hui_l2}  ${yun_l2}  ${shi_l2}`);
+    lines.push(`〇  ${hui_jiuxing[0]}  ${yun_jiuxing[0]}  ${shi_jiuxing[0]}`);
+    const hui_j2 = (hui_jiuxing.length > 1) ? hui_jiuxing[1] : '〇';
+    const yun_j2 = (yun_jiuxing.length > 1) ? yun_jiuxing[1] : '〇';
+    const shi_j2 = (shi_jiuxing.length > 1) ? shi_jiuxing[1] : '〇';
+    lines.push(`〇  ${hui_j2}  ${yun_j2}  ${shi_j2}`);
+    return lines.join("\n");
+  }
+
+  function calc_yinshi(chuan_list){
+    // 同新脚本：
+    // 1) sum_guan：每传都加 DIZHI_VALUES；天干为〇(None)则不加 TIANGAN_VALUES
+    let sum_guan = 0;
+    for (const [gan, zhi] of chuan_list){
+      if (gan != null){
+        sum_guan += TIANGAN_VALUES[gan];
+      }
+      sum_guan += DIZHI_VALUES[zhi];
+    }
+
+    // 2) cuozong：按三传相同性规则
+    let cuozong;
+    const t0 = chuan_list[0], t1 = chuan_list[1], t2 = chuan_list[2];
+    if (t0[0] === t1[0] && t0[1] === t1[1] && t0[0] === t2[0] && t0[1] === t2[1]){
+      const dizhi = t0[1];
+      cuozong = YIN_ZHI.has(dizhi) ? 360 : 720;
+    } else if (
+      (t0[0] === t1[0] && t0[1] === t1[1]) ||
+      (t0[0] === t2[0] && t0[1] === t2[1]) ||
+      (t1[0] === t2[0] && t1[1] === t2[1])
+    ){
+      const first_dizhi = t0[1];
+      cuozong = YANG_ZHI.has(first_dizhi) ? 360 : 720;
+    } else {
+      const yang_count = chuan_list.reduce((acc, t) => acc + (YANG_ZHI.has(t[1]) ? 1 : 0), 0);
+      cuozong = (yang_count >= 2) ? 720 : 360;
+    }
+
+    const total = sum_guan + cuozong;
+    const total_str = String(total).padStart(4,'0');
+    const yuan = Number(total_str[0]);
+    const hui  = Number(total_str[1]);
+    const yun  = Number(total_str[2]);
+    const shi  = Number(total_str[3]);
+
+    const [ref_gua_name, ref_gua_bin] = get_cankao_gua(hui, yun, shi);
+    const ref_wuxing = GUA_TO_WUXING[ref_gua_name];
+
+    function pos_info(num){
+      const gua = NUM_TO_GUA[num];
+      const wuxing = GUA_TO_WUXING[gua];
+      const bin_tuple = (gua === '空') ? null : GUA_BIN[gua];
+      return [gua, wuxing, bin_tuple];
+    }
+
+    const [hui_gua, hui_wuxing, hui_bin] = pos_info(hui);
+    const [yun_gua, yun_wuxing, yun_bin] = pos_info(yun);
+    const [shi_gua, shi_wuxing, shi_bin] = pos_info(shi);
+
+    const hui_liuqin = get_liuqin(ref_wuxing, hui_wuxing);
+    const yun_liuqin = get_liuqin(ref_wuxing, yun_wuxing);
+    const shi_liuqin = get_liuqin(ref_wuxing, shi_wuxing);
+
+    const hui_jiuxing = get_jiuxing(ref_gua_bin, hui_bin);
+    const yun_jiuxing = get_jiuxing(ref_gua_bin, yun_bin);
+    const shi_jiuxing = get_jiuxing(ref_gua_bin, shi_bin);
+
+    return format_yinshi_horizontal(
+      yuan, hui, yun, shi,
+      hui_gua, hui_wuxing, hui_liuqin, hui_jiuxing,
+      yun_gua, yun_wuxing, yun_liuqin, yun_jiuxing,
+      shi_gua, shi_wuxing, shi_liuqin, shi_jiuxing
+    );
+  }
+
+  // ---------------- 状态 / UI ----------------
+  const state = {
+    useSizhu: true,
+    useChuan: true,
+    editingSizhuIdx: 0,
+    editingChuanIdx: 0,
+    sizhu: [ [null,null],[null,null],[null,null],[null,null] ],
+    chuan: [ [undefined,null],[undefined,null],[undefined,null] ], // gan: undef未选 / null=〇 / string
+  };
+
+  const STORAGE_KEY = "yinshi_history_synced_2026_v3";
+
+  function formatSizhu(sizhu){
+    const names = ["年","月","日","时"];
+    const parts = [];
+    for (let i=0;i<4;i++){
+      const [g,z] = sizhu[i];
+      if (g && z) parts.push(`${g}${z}${names[i]}`);
+      else if (g || z) parts.push(`${g??"＿"}${z??"＿"}${names[i]}`);
+      else parts.push(`＿＿${names[i]}`);
+    }
+    const allEmpty = sizhu.every(([g,z]) => !g && !z);
+    return allEmpty ? "（空）" : parts.join(" ");
+  }
+  function formatChuan(ch){
+    const names = ["初","中","末"];
+    const parts = [];
+    for (let i=0;i<3;i++){
+      const [g,z] = ch[i];
+      if (g === undefined && !z) parts.push(`＿＿${names[i]}`);
+      else if (g === null && z) parts.push(`〇${z}${names[i]}`);
+      else if (typeof g === "string" && z) parts.push(`${g}${z}${names[i]}`);
+      else parts.push(`${(g===undefined?"＿":(g===null?"〇":g))}${z??"＿"}${names[i]}`);
+    }
+    const allEmpty = ch.every(([g,z]) => g===undefined && z===null);
+    return allEmpty ? "（空）" : parts.join(" ");
+  }
+
+  function refresh(){
+    $("useSizhu").checked = state.useSizhu;
+    $("useChuan").checked = state.useChuan;
+    $("sizhuSlot").style.display = state.useSizhu ? "" : "none";
+    $("chuanSlot").style.display = state.useChuan ? "" : "none";
+    $("sizhuValue").textContent = formatSizhu(state.sizhu);
+    $("chuanValue").textContent = formatChuan(state.chuan);
+
+    const sizhuIdxBtns = [...document.querySelectorAll("[data-sizhu-idx]")];
+    setActive(sizhuIdxBtns, b => Number(b.dataset.sizhuIdx) === state.editingSizhuIdx);
+    const chuanIdxBtns = [...document.querySelectorAll("[data-chuan-idx]")];
+    setActive(chuanIdxBtns, b => Number(b.dataset.chuanIdx) === state.editingChuanIdx);
+
+    // 四柱联动
+    const [sg, sz] = state.sizhu[state.editingSizhuIdx];
+    const ganBtnsS = [...$("ganBtnsSizhu").querySelectorAll("button")];
+    const zhiBtnsS = [...$("zhiBtnsSizhu").querySelectorAll("button")];
+    setActive(ganBtnsS, b => b.textContent === (sg ?? ""));
+    setActive(zhiBtnsS, b => b.textContent === (sz ?? ""));
+    applyJiaziConstraint(ganBtnsS, zhiBtnsS, sg, sz, { allowGanNullAnyZhi:false });
+
+    // 三传联动（〇不限制地支）
+    const [cg, cz] = state.chuan[state.editingChuanIdx];
+    const ganBtnsC = [...$("ganBtnsChuan").querySelectorAll("button")];
+    const zhiBtnsC = [...$("zhiBtnsChuan").querySelectorAll("button")];
+    setActive(ganBtnsC, b => (b.textContent==="〇") ? (cg===null) : (b.textContent === (cg ?? "")));
+    setActive(zhiBtnsC, b => b.textContent === (cz ?? ""));
+    applyJiaziConstraint(ganBtnsC, zhiBtnsC, cg, cz, { allowGanNullAnyZhi:true });
+  }
+
+  function initPickers(){
+    buildButtons($("ganBtnsSizhu"), GAN_LIST, (v) => {
+      state.sizhu[state.editingSizhuIdx][0] = v;
+      const z = state.sizhu[state.editingSizhuIdx][1];
+      if (z && !allowedZhiByGan.get(v).has(z)) state.sizhu[state.editingSizhuIdx][1] = null;
+      refresh();
+    });
+    buildButtons($("zhiBtnsSizhu"), ZHI_LIST, (v) => {
+      state.sizhu[state.editingSizhuIdx][1] = v;
+      const g = state.sizhu[state.editingSizhuIdx][0];
+      if (g && !allowedZhiByGan.get(g).has(v)) state.sizhu[state.editingSizhuIdx][0] = null;
+      refresh();
+    });
+
+    buildButtons($("ganBtnsChuan"), ["〇", ...GAN_LIST], (v) => {
+      state.chuan[state.editingChuanIdx][0] = (v === "〇") ? null : v;
+      const z = state.chuan[state.editingChuanIdx][1];
+      const g = state.chuan[state.editingChuanIdx][0];
+      if (typeof g === "string" && z && !allowedZhiByGan.get(g).has(z)) state.chuan[state.editingChuanIdx][1] = null;
+      refresh();
+    });
+    buildButtons($("zhiBtnsChuan"), ZHI_LIST, (v) => {
+      state.chuan[state.editingChuanIdx][1] = v;
+      const g = state.chuan[state.editingChuanIdx][0];
+      if (typeof g === "string" && !allowedZhiByGan.get(g).has(v)) state.chuan[state.editingChuanIdx][0] = undefined;
+      refresh();
+    });
+
+    document.querySelectorAll("[data-sizhu-idx]").forEach(b => b.addEventListener("click", () => { state.editingSizhuIdx = Number(b.dataset.sizhuIdx); refresh(); }));
+    document.querySelectorAll("[data-chuan-idx]").forEach(b => b.addEventListener("click", () => { state.editingChuanIdx = Number(b.dataset.chuanIdx); refresh(); }));
+
+    $("useSizhu").addEventListener("change", e => { state.useSizhu = e.target.checked; refresh(); });
+    $("useChuan").addEventListener("change", e => { state.useChuan = e.target.checked; refresh(); });
+
+    $("clearSizhuBtn").addEventListener("click", () => { state.sizhu = [ [null,null],[null,null],[null,null],[null,null] ]; refresh(); });
+    $("clearChuanBtn").addEventListener("click", () => { state.chuan = [ [undefined,null],[undefined,null],[undefined,null] ]; refresh(); });
+
+    $("unsetSizhuGanBtn").addEventListener("click", () => { state.sizhu[state.editingSizhuIdx][0] = null; refresh(); });
+    $("unsetSizhuZhiBtn").addEventListener("click", () => { state.sizhu[state.editingSizhuIdx][1] = null; refresh(); });
+    $("unsetChuanGanBtn").addEventListener("click", () => { state.chuan[state.editingChuanIdx][0] = undefined; refresh(); });
+    $("unsetChuanZhiBtn").addEventListener("click", () => { state.chuan[state.editingChuanIdx][1] = null; refresh(); });
+
+    $("clearOutBtn").addEventListener("click", () => outEl.textContent = "");
+  }
+
+  function getSizhuPairsStrict(){
+    for (const [g,z] of state.sizhu){
+      if (!g || !z) return null;
+      if (!allowedZhiByGan.get(g).has(z)) return null;
+    }
+    return state.sizhu.map(([g,z]) => [g,z]);
+  }
+  function getChuanPairsStrict(){
+    for (const [g,z] of state.chuan){
+      if (!z) return null;
+      if (g === undefined) return null;
+      if (typeof g === "string" && !allowedZhiByGan.get(g).has(z)) return null;
+      // g === null(〇) 允许任何 z
+    }
+    return state.chuan.map(([g,z]) => [g===undefined?null:g, z]);
+  }
+
+  function compute(){
+    const useS = state.useSizhu;
+    const useC = state.useChuan;
+    const sizhu = useS ? getSizhuPairsStrict() : null;
+
+    const ch0g = state.chuan[0][0];
+    const ch0z = state.chuan[0][1];
+    const chuan0_empty = (ch0g === undefined) && (!ch0z);
+
+    if (useS && sizhu && (!useC || chuan0_empty)){
+      return calc_sizhu_gua(sizhu);
+    }
+
+    if (useC){
+      const chuan = getChuanPairsStrict();
+      if (!chuan){
+        throw new Error("三传未填完整：需要初/中/末都选地支，且天干要么选“〇”要么选天干（不能留空）。若选了天干，也必须与地支构成六十甲子。");
+      }
+      const parts = [];
+      if (useS && sizhu){
+        const gan_names = ['年','月','日','时'];
+        parts.push("【四柱干支】");
+        parts.push(sizhu.map(([gan,zhi],i)=>`${gan}${zhi}${gan_names[i]}`).join(" "));
+        parts.push("");
+      }
+      parts.push(calc_yinshi(chuan));
+      if (useS && sizhu){
+        parts.push("");
+        parts.push(calc_sizhu_gua(sizhu));
+      }
+      return parts.join("\n");
+    }
+
+    throw new Error("没有可计算的内容：请启用四柱或三传。");
+  }
+
+  // ---------------- 历史 ----------------
+  function loadHistory(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch { return []; }
+  }
+  function saveHistory(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+  function pushHistory(entry){
+    const hist = loadHistory();
+    hist.unshift(entry);
+    if (hist.length > 50) hist.length = 50;
+    saveHistory(hist);
+    renderHistory();
+  }
+  function fillFromEntry(entry){
+    state.useSizhu = !!entry.useSizhu;
+    state.useChuan = !!entry.useChuan;
+
+    state.sizhu = [ [null,null],[null,null],[null,null],[null,null] ];
+    if (entry.sizhu?.length === 4){
+      for (let i=0;i<4;i++){
+        const [g,z] = entry.sizhu[i];
+        state.sizhu[i] = [g ?? null, z ?? null];
+      }
+    }
+    state.chuan = [ [undefined,null],[undefined,null],[undefined,null] ];
+    if (entry.chuan?.length === 3){
+      for (let i=0;i<3;i++){
+        const [g,z] = entry.chuan[i];
+        state.chuan[i] = [g, z ?? null];
+      }
+    }
+    state.editingSizhuIdx = 0;
+    state.editingChuanIdx = 0;
+    refresh();
+    outEl.textContent = entry.output ?? "";
+  }
+  function mkBtn(text, cls, onClick){
+    const b = document.createElement("button");
+    b.textContent = text;
+    b.className = cls;
+    b.addEventListener("click", onClick);
+    return b;
+  }
+  function renderHistory(){
+    const hist = loadHistory();
+    const host = $("history");
+    host.innerHTML = "";
+    if (!hist.length){
+      const div = document.createElement("div");
+      div.className = "sub";
+      div.textContent = "暂无历史。点击“计算并保存到历史”后会出现在这里。";
+      host.appendChild(div);
+      return;
+    }
+    hist.forEach((h, idx) => {
+      const item = document.createElement("div");
+      item.className = "histItem";
+
+      const top = document.createElement("div");
+      top.className = "histTop";
+
+      const meta = document.createElement("div");
+      meta.className = "histMeta";
+      const s = h.useSizhu ? (h.sizhuText ?? "") : "（四柱未启用）";
+      const c = h.useChuan ? (h.chuanText ?? "") : "（三传未启用）";
+      meta.innerHTML = `
+        <div>时间：<span class="mono">${h.time ?? ""}</span></div>
+        <div>四柱：<span class="mono">${escapeHtml(s)}</span></div>
+        <div>三传：<span class="mono">${escapeHtml(c)}</span></div>
+      `;
+
+      const btns = document.createElement("div");
+      btns.className = "histBtns";
+      btns.append(
+        mkBtn("回填", "small pill", () => fillFromEntry(h)),
+        mkBtn("复制结果", "small ghost", () => copyText(h.output ?? "")),
+        mkBtn("删除", "small danger", () => {
+          const arr = loadHistory();
+          arr.splice(idx,1);
+          saveHistory(arr);
+          renderHistory();
+        })
+      );
+
+      top.append(meta, btns);
+
+      const out = document.createElement("div");
+      out.className = "histOut mono";
+      out.textContent = h.output ?? "";
+
+      item.append(top, out);
+      host.appendChild(item);
+    });
+  }
+
+  // ---------------- 事件 ----------------
+  $("runBtn").addEventListener("click", () => {
+    try{
+      const output = compute();
+      outEl.textContent = output;
+      const entry = {
+        time: nowISO(),
+        useSizhu: state.useSizhu,
+        useChuan: state.useChuan,
+        sizhu: state.sizhu.map(([g,z]) => [g, z]),
+        chuan: state.chuan.map(([g,z]) => [g, z]),
+        sizhuText: formatSizhu(state.sizhu),
+        chuanText: formatChuan(state.chuan),
+        output
+      };
+      pushHistory(entry);
+    } catch(e){
+      outEl.textContent = "错误：" + (e?.message ?? String(e));
+    }
+  });
+
+  $("copyBtn").addEventListener("click", () => copyText(outEl.textContent || ""));
+  $("resetAllBtn").addEventListener("click", () => {
+    state.useSizhu = true;
+    state.useChuan = true;
+    state.editingSizhuIdx = 0;
+    state.editingChuanIdx = 0;
+    state.sizhu = [ [null,null],[null,null],[null,null],[null,null] ];
+    state.chuan = [ [undefined,null],[undefined,null],[undefined,null] ];
+    outEl.textContent = "";
+    refresh();
+  });
+
+  $("fillDemoBtn").addEventListener("click", () => {
+    // 示例（全是合法六十甲子；三传也可用〇）
+    state.useSizhu = true;
+    state.useChuan = true;
+    state.sizhu = [ ['丙','午'], ['庚','寅'], ['壬','申'], ['甲','辰'] ];
+    state.chuan = [ ['甲','子'], ['丙','午'], ['癸','亥'] ];
+    state.editingSizhuIdx = 0;
+    state.editingChuanIdx = 0;
+    refresh();
+  });
+
+  $("clearHistoryBtn").addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    renderHistory();
+  });
+
+  $("exportHistoryBtn").addEventListener("click", async () => {
+    const hist = loadHistory();
+    const json = JSON.stringify(hist, null, 2);
+    await copyText(json);
+    alert("已复制历史JSON到剪贴板（可粘贴保存为文件）");
+  });
+
+  // ---------------- 初始化 ----------------
+  initPickers();
+  refresh();
+  renderHistory();
+})();
+</script>
+</body>
+</html>
